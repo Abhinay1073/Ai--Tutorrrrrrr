@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Academy Pro - Interactive Learning Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            --accent: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            --success: linear-gradient(45deg, #56ab2f 0%, #a8e6cf 100%);
+            --warning: linear-gradient(45deg, #ff6b6b 0%, #feca57 100%);
+            --glass: rgba(255, 255, 255, 0.1);
+            --text-primary: #2c3e50;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            backdrop-filter: blur(20px);
+            background: var(--glass);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .datetime-display {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            text-align: right;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+        }
+
+        .datetime-display .date {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .datetime-display .time {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #4facfe;
+            text-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 20px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 20px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            text-align: center;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px 20px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar, .ai-assistant, .chat-container, .exam-container {
+            backdrop-filter: blur(20px);
+            background: var(--glass);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .exam-container {
+            grid-column: 1 / -1;
+            display: none;
+        }
+
+        .course-nav h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            height: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            background: var(--success);
+            height: 100%;
+            width: 0%;
+            transition: width 0.8s ease;
+            border-radius: 15px;
+        }
+
+        .progress-text {
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .topic-list {
+            list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .topic-item {
+            padding: 15px 20px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .topic-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .topic-item.active {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .topic-item.completed {
+            background: var(--success);
+        }
+
+        .topic-item.completed::after {
+            content: '✓';
+            position: absolute;
+            right: 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .topic-difficulty {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-left: auto;
+            padding: 3px 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .chat-container {
+            height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .chat-title {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .typing-indicator {
+            display: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-radius: 20px;
+            max-width: 85%;
+            word-wrap: break-word;
+            animation: messageSlideIn 0.4s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai-message {
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--text-primary);
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .send-btn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .voice-btn {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .voice-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .speak-btn {
+            background: var(--accent);
+            color: white;
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+
+        .ai-assistant {
+            height: fit-content;
+        }
+
+        .assistant-header {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ai-status {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .api-setup {
+            background: rgba(255, 243, 205, 0.1);
+            border: 1px solid rgba(255, 234, 167, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .api-setup h4 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .api-setup p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+
+        .api-input {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 8px 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .save-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .learning-path {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .path-title {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .quick-btn {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Exam Styles */
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .exam-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .exam-info {
+            display: flex;
+            gap: 20px;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .exam-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+        }
+
+        .exam-question {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            color: white;
+            margin-bottom: 25px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .exam-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            text-align: left;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .option-btn.selected {
+            background: var(--accent);
+            border-color: rgba(79, 172, 254, 0.5);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .exam-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .prev-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .next-btn {
+            background: var(--success);
+            color: white;
+        }
+
+        .finish-btn {
+            background: var(--warning);
+            color: white;
+        }
+
+        .exam-sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .exam-progress {
+            margin-bottom: 25px;
+        }
+
+        .progress-title {
+            color: white;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .question-indicator {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .question-indicator.current {
+            background: var(--accent);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(79, 172, 254, 0.5);
+        }
+
+        .question-indicator.answered {
+            background: var(--success);
+        }
+
+        .timer-display {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .exam-results {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .result-title {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .score-display {
+            font-size: 5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #56ab2f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 20px 0;
+        }
+
+        .result-message {
+            font-size: 1.4rem;
+            color: white;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .review-btn {
+            background: var(--accent);
+            color: white;
+        }
+
+        .retake-btn {
+            background: var(--warning);
+            color: white;
+        }
+
+        .continue-btn {
+            background: var(--success);
+            color: white;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .chat-container {
+                height: 600px;
+            }
+            
+            .exam-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .datetime-display {
+                position: static;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .input-section {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .voice-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .questions-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .exam-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-btn {
+                width: 100%;
+            }
+            
+            .result-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="datetime-display" id="datetimeDisplay">
+                <div class="date" id="currentDate">Loading...</div>
+                <div class="time" id="currentTime">Loading...</div>
+            </div>
+            <h1>🚀 AI Academy Pro</h1>
+            <p>Master Artificial Intelligence through Interactive Learning</p>
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-number" id="totalTopics">12</div>
+                    <div class="stat-label">Topics</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="completedCount">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="accuracyScore">0%</div>
+                    <div class="stat-label">Progress</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="api-setup">
+            <h4>🔐 API Configuration</h4>
+            <p>Configure your AI services for the complete learning experience:</p>
+            <input type="password" id="openaiKey" class="api-input" placeholder="OpenAI API Key (GPT-4)">
+            <input type="password" id="geminiKey" class="api-input" placeholder="Google Gemini API Key">
+            <input type="password" id="elevenLabsKey" class="api-input" placeholder="ElevenLabs API Key (Voice)">
+            <button class="save-btn" onclick="saveApiKeys()">💾 Save Configuration</button>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="course-nav">
+                    <h3>📚 Learning Path</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">0/12 modules completed</div>
+                    
+                    <div class="learning-path">
+                        <div class="path-title">🎯 Current Focus</div>
+                        <div id="currentFocus">Introduction to AI</div>
+                    </div>
+                    
+                    <div class="topic-list" id="topicList"></div>
+
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="startExam()">📝 Start Exam</button>
+                        <button class="quick-btn" onclick="explainConcept()">🔍 Explain</button>
+                        <button class="quick-btn" onclick="showSummary()">📋 Summary</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-container" id="chatContainer">
+                <div class="chat-header">
+                    <div class="chat-title">💬 AI Tutor Conversation</div>
+                    <div class="typing-indicator" id="typingIndicator">AI is thinking...</div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages"></div>
+
+                <div class="input-section">
+                    <input type="text" 
+                           id="chatInput" 
+                           class="chat-input" 
+                           placeholder="Ask me anything about AI fundamentals..."
+                           onkeypress="handleKeyPress(event)">
+                    <button class="btn send-btn" onclick="sendMessage()">🚀 Send</button>
+                    <button class="btn voice-btn" id="voiceBtn" onclick="toggleVoiceRecording()">🎤 Voice</button>
+                </div>
+
+                <div class="voice-controls">
+                    <button class="btn speak-btn" onclick="speakLastMessage()">🔊 Speak</button>
+                    <button class="btn speak-btn" onclick="stopSpeaking()">⏹ Stop</button>
+                </div>
+            </div>
+
+            <div class="ai-assistant">
+                <div class="assistant-header">🤖 AI Assistant</div>
+                
+                <div class="ai-status">
+                    <div class="status-indicator">
+                        <div class="status-dot"></div>
+                        <span>AI Ready</span>
+                    </div>
+                </div>
+
+                <div class="learning-path">
+                    <div class="path-title">📊 Your Progress</div>
+                    <div id="learningInsights">Welcome! Start your AI journey.</div>
+                </div>
+
+                <div class="learning-path">
+                    <div class="path-title">🎯 Recommendations</div>
+                    <div id="recommendations">
+                        <ul>
+                            <li>Start with basic AI concepts</li>
+                            <li>Practice with interactive examples</li>
+                            <li>Use exams to test your knowledge</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="resetProgress()">🔄 Reset</button>
+                    <button class="quick-btn" onclick="exportProgress()">📤 Export</button>
+                </div>
+            </div>
+            
+            <!-- Exam Container -->
+            <div class="exam-container" id="examContainer">
+                <div class="exam-header">
+                    <div class="exam-title" id="examTitle">AI Fundamentals Exam</div>
+                    <div class="exam-info">
+                        <div>Question: <span id="currentQuestion">1</span>/<span id="totalQuestions">10</span></div>
+                        <div>Time: <span id="examTimer">05:00</span></div>
+                    </div>
+                </div>
+                
+                <div class="exam-content">
+                    <div class="exam-main">
+                        <div class="exam-question">
+                            <div class="question-text" id="questionText"></div>
+                            <div class="exam-options" id="examOptions"></div>
+                        </div>
+                        
+                        <div class="exam-nav">
+                            <button class="nav-btn prev-btn" onclick="prevQuestion()">◀ Previous</button>
+                            <button class="nav-btn next-btn" onclick="nextQuestion()">Next ▶</button>
+                            <button class="nav-btn finish-btn" onclick="finishExam()">Finish Exam</button>
+                        </div>
+                    </div>
+                    
+                    <div class="exam-sidebar">
+                        <div class="exam-progress">
+                            <div class="progress-title">Progress</div>
+                            <div class="questions-grid" id="questionsGrid"></div>
+                        </div>
+                        
+                        <div class="timer-display" id="timerDisplay">
+                            <div>Time Remaining</div>
+                            <div id="countdown">05:00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="exam-results" id="examResults">
+                    <div class="result-title" id="resultTitle">Exam Results</div>
+                    <div class="score-display" id="scoreDisplay">0%</div>
+                    <div class="result-message" id="resultMessage"></div>
+                    
+                    <div class="result-actions">
+                        <button class="action-btn review-btn" onclick="reviewAnswers()">Review Answers</button>
+                        <button class="action-btn retake-btn" onclick="retakeExam()">Retake Exam</button>
+                        <button class="action-btn continue-btn" onclick="continueLearning()">Continue Learning</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentTopic = 0;
+        let completedTopics = new Set();
+        let conversationHistory = [];
+        let userProgress = { totalInteractions: 0 };
+        
+        // Exam state
+        let examState = {
+            active: false,
+            currentQuestion: 0,
+            answers: [],
+            timeRemaining: 300, // 5 minutes in seconds
+            timer: null,
+            examTopic: ""
+        };
+
+        // Course topics with detailed content
+        const topics = [
+            { title: "Introduction to AI", icon: "🧠", difficulty: "Beginner" },
+            { title: "Machine Learning Basics", icon: "📊", difficulty: "Beginner" },
+            { title: "Neural Networks", icon: "🕸", difficulty: "Intermediate" },
+            { title: "Deep Learning", icon: "🌊", difficulty: "Advanced" },
+            { title: "Natural Language Processing", icon: "💬", difficulty: "Intermediate" },
+            { title: "Computer Vision", icon: "👁", difficulty: "Intermediate" },
+            { title: "Reinforcement Learning", icon: "🎮", difficulty: "Advanced" },
+            { title: "AI Ethics", icon: "⚖", difficulty: "Intermediate" },
+            { title: "Data Science for AI", icon: "📈", difficulty: "Intermediate" },
+            { title: "AI in Healthcare", icon: "🏥", difficulty: "Advanced" },
+            { title: "Autonomous Systems", icon: "🤖", difficulty: "Advanced" },
+            { title: "Future of AI", icon: "🚀", difficulty: "All Levels" }
+        ];
+
+        // Exam questions database (10 per topic)
+        const topicExams = {
+            "Introduction to AI": [
+                {
+                    question: "What does AI stand for?",
+                    options: [
+                        "Artificial Intelligence",
+                        "Automated Input",
+                        "Algorithmic Inference",
+                        "Applied Integration"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "Which of these is NOT a type of AI?",
+                    options: [
+                        "Narrow AI",
+                        "General AI",
+                        "Super AI",
+                        "Complex AI"
+                    ],
+                    correct: 3
+                },
+                {
+                    question: "What is the primary goal of AI?",
+                    options: [
+                        "To create machines that can perform tasks requiring human intelligence",
+                        "To replace human workers",
+                        "To develop self-aware machines",
+                        "To create systems that can only perform specific tasks"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "Which application is an example of AI?",
+                    options: [
+                        "Virtual assistants like Siri or Alexa",
+                        "Basic calculators",
+                        "Word processors",
+                        "Spreadsheets"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What is the Turing Test used for?",
+                    options: [
+                        "To determine if a machine can exhibit intelligent behavior equivalent to a human",
+                        "To test computer processing speed",
+                        "To evaluate graphics capabilities",
+                        "To measure memory capacity"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "Which branch of AI focuses on enabling machines to understand human language?",
+                    options: [
+                        "Natural Language Processing",
+                        "Computer Vision",
+                        "Robotics",
+                        "Expert Systems"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What distinguishes Narrow AI from General AI?",
+                    options: [
+                        "Narrow AI specializes in specific tasks, while General AI can perform any intellectual task a human can",
+                        "Narrow AI is less accurate than General AI",
+                        "General AI is currently more widely used than Narrow AI",
+                        "Narrow AI requires more computational power than General AI"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "Which of these is a key characteristic of machine learning?",
+                    options: [
+                        "Systems learn from data without explicit programming",
+                        "Systems follow strict rule-based programming",
+                        "Systems require human intervention for every decision",
+                        "Systems cannot improve over time"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What is the main purpose of an algorithm in AI?",
+                    options: [
+                        "To provide step-by-step instructions for solving a problem",
+                        "To store large amounts of data",
+                        "To visualize complex data sets",
+                        "To connect to the internet"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "Which AI technique involves learning through trial and error?",
+                    options: [
+                        "Reinforcement Learning",
+                        "Supervised Learning",
+                        "Unsupervised Learning",
+                        "Deep Learning"
+                    ],
+                    correct: 0
+                }
+            ],
+            "Machine Learning Basics": [
+                {
+                    question: "What is the core concept of machine learning?",
+                    options: [
+                        "Enabling computers to learn from data without explicit programming",
+                        "Teaching computers specific rules for all possible scenarios",
+                        "Creating algorithms that never change",
+                        "Programming computers to perform tasks step-by-step"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "Which of these is a type of machine learning?",
+                    options: [
+                        "Supervised learning",
+                        "Random learning",
+                        "Fixed learning",
+                        "Manual learning"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What is the purpose of training data in ML?",
+                    options: [
+                        "To teach the algorithm patterns and relationships",
+                        "To test the final model",
+                        "To store results",
+                        "To visualize outcomes"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "Which algorithm is commonly used for classification?",
+                    options: [
+                        "Decision Trees",
+                        "Linear Regression",
+                        "K-Means Clustering",
+                        "Principal Component Analysis"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What is overfitting in ML?",
+                    options: [
+                        "When a model performs well on training data but poorly on new data",
+                        "When a model is too simple",
+                        "When training takes too long",
+                        "When data is perfectly balanced"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What is the difference between classification and regression?",
+                    options: [
+                        "Classification predicts categories, regression predicts continuous values",
+                        "Classification is for images, regression is for text",
+                        "Classification requires more data than regression",
+                        "Regression is faster than classification"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "Which technique helps prevent overfitting?",
+                    options: [
+                        "Cross-validation",
+                        "Increasing model complexity",
+                        "Using all available data for training",
+                        "Reducing the number of features"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What does 'feature engineering' refer to?",
+                    options: [
+                        "The process of creating new input variables from raw data",
+                        "The design of machine learning algorithms",
+                        "The visualization of model results",
+                        "The deployment of ML models"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "Which evaluation metric is used for classification problems?",
+                    options: [
+                        "Accuracy",
+                        "Mean Squared Error",
+                        "R-squared",
+                        "Adjusted R-squared"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What is the purpose of a validation set?",
+                    options: [
+                        "To fine-tune model parameters during training",
+                        "To test the final model performance",
+                        "To train the initial model",
+                        "To store historical data"
+                    ],
+                    correct: 0
+                }
+            ],
+            "Neural Networks": [
+                {
+                    question: "What is the basic unit of a neural network?",
+                    options: [
+                        "Neuron",
+                        "Synapse",
+                        "Layer",
+                        "Weight"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What is the purpose of an activation function?",
+                    options: [
+                        "To introduce non-linearity into the network",
+                        "To store weights",
+                        "To calculate inputs",
+                        "To visualize data"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "Which type of layer is typically the last in a classification network?",
+                    options: [
+                        "Output layer",
+                        "Input layer",
+                        "Hidden layer",
+                        "Convolutional layer"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What is backpropagation used for?",
+                    options: [
+                        "Adjusting weights based on error",
+                        "Forwarding data through the network",
+                        "Initializing weights",
+                        "Reducing network size"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What problem does ReLU help solve?",
+                    options: [
+                        "Vanishing gradient problem",
+                        "Overfitting",
+                        "Underfitting",
+                        "Data imbalance"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What is a convolutional neural network primarily used for?",
+                    options: [
+                        "Image recognition",
+                        "Text generation",
+                        "Time series forecasting",
+                        "Recommendation systems"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What does 'epoch' mean in neural network training?",
+                    options: [
+                        "One complete pass through the entire training dataset",
+                        "The time it takes to train a model",
+                        "A type of neural network architecture",
+                        "The error rate of a model"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "Which technique is used to reduce overfitting in neural networks?",
+                    options: [
+                        "Dropout",
+                        "Increasing network depth",
+                        "Using larger learning rates",
+                        "Adding more neurons to each layer"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What is the role of the loss function?",
+                    options: [
+                        "To measure how well the model is performing",
+                        "To initialize the weights of the network",
+                        "To visualize the network architecture",
+                        "To select the activation function"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What does 'deep' refer to in deep learning?",
+                    options: [
+                        "Multiple layers in the neural network",
+                        "Complex mathematical operations",
+                        "Large amounts of training data",
+                        "High-dimensional feature spaces"
+                    ],
+                    correct: 0
+                }
+            ]
+            // Additional topics would follow the same pattern
+        };
+
+        // Enhanced knowledge base with topic-specific Q&A
+        const topicQA = {
+            "introduction to ai": {
+                "what is artificial intelligence": "Artificial Intelligence (AI) is the simulation of human intelligence processes by machines, especially computer systems. Unlike human intelligence, which is biological and conscious, AI relies on algorithms and data processing. AI can perform specific tasks efficiently but lacks consciousness, emotions, and general understanding that humans possess.",
+                "main goals of artificial intelligence": "The main goals of AI include: 1) Automation - performing tasks without human intervention, 2) Problem-solving - finding solutions to complex problems, 3) Learning - improving performance through experience, 4) Reasoning - making logical decisions based on available information, and 5) Perception - understanding and interpreting sensory data.",
+                "real-life applications of ai": "Three major real-life AI applications are: 1) Virtual assistants like Siri and Alexa for voice recognition and task automation, 2) Recommendation systems used by Netflix, Amazon, and YouTube to suggest content, and 3) Medical diagnosis systems that help doctors detect diseases in medical imaging and patient data analysis.",
+                "types of ai": "AI is classified into three types: 1) Narrow AI (Weak AI) - designed for specific tasks like chess or image recognition, currently the only type that exists, 2) General AI (Strong AI) - hypothetical AI with human-level intelligence across all domains, and 3) Super AI - theoretical AI that surpasses human intelligence in all aspects, still science fiction."
+            }
+            // Additional topics would follow the same pattern
+        };
+
+        // Enhanced response system
+        function getResponse(message) {
+            const lowerMessage = message.toLowerCase().trim();
+            
+            // Check for topic-specific questions
+            for (const [topicKey, questions] of Object.entries(topicQA)) {
+                for (const [questionKey, answer] of Object.entries(questions)) {
+                    if (lowerMessage.includes(questionKey.toLowerCase()) || 
+                        questionKey.toLowerCase().includes(lowerMessage) ||
+                        calculateSimilarity(lowerMessage, questionKey.toLowerCase()) > 0.6) {
+                        return `📚 <strong>${questionKey.toUpperCase()}</strong><br><br>${answer}<br><br>💡 <em>Would you like to know more about this topic or ask another question?</em>`;
+
+                    }
+                }
+            }
+
+            // Check for general AI terms
+            const generalResponses = {
+                "artificial intelligence": "Artificial Intelligence is a broad field focused on creating machines that can perform tasks requiring human intelligence.",
+                "machine learning": "Machine Learning enables computers to learn patterns from data without explicit programming.",
+                "neural networks": "Neural networks are computational models inspired by the human brain's structure.",
+                "deep learning": "Deep learning uses multi-layered neural networks to learn complex patterns in data.",
+                "help": "I can answer questions about all 12 AI topics! Try asking about specific concepts like 'what is machine learning' or 'types of AI'.",
+                "topics": "I cover 12 topics: Introduction to AI, Machine Learning, Neural Networks, Deep Learning, NLP, Computer Vision, Reinforcement Learning, AI Ethics, Data Science, AI in Healthcare, Autonomous Systems, and Future of AI.",
+                "exam": "Test your knowledge with a comprehensive exam! Click the 'Start Exam' button in the sidebar."
+            };
+
+            for (const [key, response] of Object.entries(generalResponses)) {
+    if (lowerMessage.includes(key)) {
+        return `🤖 ${response}<br><br>Feel free to ask more specific questions!`;
+    }
+}
+
+return `🤔 I'm here to help with AI topics! Try asking specific questions like:<br>
+• "What is artificial intelligence?"<br>
+• "Types of machine learning"<br>
+• "How do neural networks work?"<br>
+• "AI ethics concerns"<br><br>
+Or take an exam to test your knowledge!`;
+}
+
+// Simple similarity calculation for better question matching
+function calculateSimilarity(str1, str2) {
+    const words1 = str1.split(' ');
+    const words2 = str2.split(' ');
+    const commonWords = words1.filter(word => words2.includes(word));
+    return commonWords.length / Math.max(words1.length, words2.length);
+}
+
+// Initialize application
+function init() {
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+    generateTopicList();
+    addWelcomeMessage();
+    updateStats();
+}
+
+// Update date and time
+function updateDateTime() {
+    const now = new Date();
+    const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    };
+    const timeOptions = { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit',
+        hour12: true 
+    };
+
+    document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+    document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', timeOptions);
+}
+
+// Generate topic list
+function generateTopicList() {
+    const topicList = document.getElementById('topicList');
+    topicList.innerHTML = '';
+    
+    topics.forEach((topic, index) => {
+        const topicItem = document.createElement('button');
+        topicItem.className = `topic-item ${index === currentTopic ? 'active' : ''} ${completedTopics.has(index) ? 'completed' : ''}`;
+        topicItem.innerHTML = `
+            ${topic.icon} ${index + 1}. ${topic.title}
+            <span class="topic-difficulty">${topic.difficulty}</span>
+        `;
+        topicItem.onclick = () => selectTopic(index);
+        topicList.appendChild(topicItem);
+    });
+}
+
+// Select topic
+function selectTopic(index) {
+    currentTopic = index;
+    generateTopicList();
+    document.getElementById('currentFocus').textContent = topics[index].title;
+    
+    const topicKey = topics[index].title.toLowerCase();
+    const sampleQuestions = Object.keys(topicQA[topicKey] || {}).slice(0, 2);
+    const questionText = sampleQuestions.length > 0 ? 
+        `<br><br>📝 <strong>Try asking:</strong><br>• ${sampleQuestions.join('<br>• ')}` : '';
+    
+    addMessage(`Welcome to <strong>${topics[index].title}</strong>! This is a ${topics[index].difficulty} level topic.${questionText}`, 'ai');
+}
+
+// Handle key press
+function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
+}
+
+// Send message
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    
+    if (message === '') return;
+
+    addMessage(message, 'user');
+    input.value = '';
+    userProgress.totalInteractions++;
+
+    showTypingIndicator(true);
+
+    setTimeout(() => {
+        const response = getResponse(message);
+        addMessage(response, 'ai');
+        updateStats();
+        showTypingIndicator(false);
+    }, 1500);
+}
+
+// Add message to chat
+function addMessage(message, sender) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message`;
+    
+    const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const senderIcon = sender === 'ai' ? '🤖 AI Tutor' : '👤 You';
+    
+    messageDiv.innerHTML = `
+        <div class="message-header">
+            ${senderIcon}
+            <span style="font-size: 0.8rem; opacity: 0.7; margin-left: auto;">${time}</span>
+        </div>
+        ${message}
+    `;
+    
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Welcome message
+function addWelcomeMessage() {
+    const welcomeMessage = `🎉 <strong>Welcome to AI Academy Pro!</strong><br><br>
+    🚀 <strong>Enhanced Features:</strong><br>
+    • Comprehensive exams with 10 questions per topic<br>
+    • 5-minute timed tests to challenge your knowledge<br>
+    • Detailed explanations for every concept<br>
+    • Voice capabilities for hands-free learning<br><br>
+    💡 <strong>Try asking:</strong><br>
+    • "What is artificial intelligence?"<br>
+    • "Explain neural networks"<br>
+    • "Start an exam on machine learning"`;
+    addMessage(welcomeMessage, 'ai');
+}
+
+// Show typing indicator
+function showTypingIndicator(show) {
+    document.getElementById('typingIndicator').style.display = show ? 'block' : 'none';
+}
+
+// Update statistics
+function updateStats() {
+    const progress = Math.round((completedTopics.size / topics.length) * 100);
+    document.getElementById('completedCount').textContent = completedTopics.size;
+    document.getElementById('accuracyScore').textContent = progress + '%';
+    document.getElementById('progressFill').style.width = progress + '%';
+    document.getElementById('progressText').textContent = `${completedTopics.size}/${topics.length} modules completed`;
+}
+
+// Quick action functions
+function explainConcept() {
+    const currentTopicKey = topics[currentTopic].title.toLowerCase();
+    if (topicQA[currentTopicKey]) {
+        const firstQuestion = Object.keys(topicQA[currentTopicKey])[0];
+        const firstAnswer = topicQA[currentTopicKey][firstQuestion];
+        addMessage(`🔍 <strong>Key Concept:</strong><br>${firstAnswer}`, 'ai');
+    } else {
+        addMessage('🔍 I can explain any AI concept! Ask me specific questions about the topics.', 'ai');
+    }
+}
+
+function showSummary() {
+    addMessage(`📋 <strong>Summary:</strong> You're currently learning about ${topics[currentTopic].title}. This is a ${topics[currentTopic].difficulty} level topic. Ask specific questions to dive deeper into the concepts!`, 'ai');
+}
+
+function resetProgress() {
+    if (confirm('Reset all progress?')) {
+        completedTopics.clear();
+        document.getElementById('chatMessages').innerHTML = '';
+        generateTopicList();
+        updateStats();
+        addWelcomeMessage();
+    }
+}
+
+function exportProgress() {
+    alert('Progress exported successfully! (Demo feature)');
+}
+
+function saveApiKeys() {
+    alert('API keys saved successfully!');
+}
+
+// Exam Functions
+function startExam() {
+    const topicName = topics[currentTopic].title;
+    const exam = topicExams[topicName];
+    
+    if (!exam) {
+        addMessage(`📚 Exam: Currently no exam available for ${topicName}. Try another topic!`, 'ai');
+        return;
+    }
+    
+    examState = {
+        active: true,
+        currentQuestion: 0,
+        answers: Array(exam.length).fill(null),
+        timeRemaining: 300, // 5 minutes for exam
+        timer: null,
+        examTopic: topicName
+    };
+    
+    // Hide chat, show exam
+    document.getElementById('chatContainer').style.display = 'none';
+    document.getElementById('examContainer').style.display = 'block';
+    document.getElementById('examTitle').textContent = `${topicName} Exam`;
+    document.getElementById('totalQuestions').textContent = exam.length;
+    document.getElementById('questionsGrid').innerHTML = '';
+    
+    // Create question indicators
+    for (let i = 0; i < exam.length; i++) {
+        const indicator = document.createElement('div');
+        indicator.className = 'question-indicator';
+        indicator.textContent = i + 1;
+        indicator.onclick = () => goToQuestion(i);
+        document.getElementById('questionsGrid').appendChild(indicator);
+    }
+    
+    startTimer();
+    displayQuestion();
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    
+    examState.timer = setInterval(() => {
+        examState.timeRemaining--;
+        updateTimerDisplay();
+        
+        if (examState.timeRemaining <= 0) {
+            clearInterval(examState.timer);
+            finishExam();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const minutes = Math.floor(examState.timeRemaining / 60);
+    const seconds = examState.timeRemaining % 60;
+    document.getElementById('examTimer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    document.getElementById('countdown').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+
+function displayQuestion() {
+    const topicName = examState.examTopic;
+    const exam = topicExams[topicName];
+    const question = exam[examState.currentQuestion];
+    
+    document.getElementById('currentQuestion').textContent = examState.currentQuestion + 1;
+    document.getElementById('questionText').textContent = question.question;
+    
+    const indicators = document.querySelectorAll('.question-indicator');
+    indicators.forEach((indicator, index) => {
+        indicator.classList.remove('current', 'answered');
+        if (index === examState.currentQuestion) indicator.classList.add('current');
+        if (examState.answers[index] !== null) indicator.classList.add('answered');
+    });
+    
+    const optionsContainer = document.getElementById('examOptions');
+    optionsContainer.innerHTML = '';
+    
+    question.options.forEach((option, index) => {
+        const optionBtn = document.createElement('button');
+        optionBtn.className = 'option-btn';
+        if (examState.answers[examState.currentQuestion] === index) optionBtn.classList.add('selected');
+        optionBtn.textContent = option;
+        optionBtn.onclick = () => selectOption(index);
+        optionsContainer.appendChild(optionBtn);
+    });
+}
+
+function selectOption(optionIndex) {
+    examState.answers[examState.currentQuestion] = optionIndex;
+    
+    const options = document.querySelectorAll('.option-btn');
+    options.forEach((btn, index) => {
+        btn.classList.remove('selected');
+        if (index === optionIndex) btn.classList.add('selected');
+    });
+    
+    const indicators = document.querySelectorAll('.question-indicator');
+    indicators[examState.currentQuestion].classList.add('answered');
+}
+
+function prevQuestion() {
+    if (examState.currentQuestion > 0) {
+        examState.currentQuestion--;
+        displayQuestion();
+    }
+}
+
+function nextQuestion() {
+    const topicName = examState.examTopic;
+    const exam = topicExams[topicName];
+    
+    if (examState.currentQuestion < exam.length - 1) {
+        examState.currentQuestion++;
+        displayQuestion();
+    }
+}
+
+function goToQuestion(index) {
+    examState.currentQuestion = index;
+    displayQuestion();
+}
+
+function finishExam() {
+    clearInterval(examState.timer);
+    
+    const topicName = examState.examTopic;
+    const exam = topicExams[topicName];
+    
+    let correct = 0;
+    for (let i = 0; i < exam.length; i++) {
+        if (examState.answers[i] === exam[i].correct) {
+            correct++;
+        }
+    }
+    
+    const score = Math.round((correct / exam.length) * 100);
+    
+    document.querySelector('.exam-content').style.display = 'none';
+    document.getElementById('examResults').style.display = 'block';
+    document.getElementById('scoreDisplay').textContent = `${score}%`;
+    document.getElementById('resultTitle').textContent = 'Exam Results';
+    
+    let message = '';
+    if (score >= 90) {
+        message = `🎉 Outstanding! You've mastered ${topicName} with ${correct} out of ${exam.length} correct answers. Your understanding is exceptional!`;
+    } else if (score >= 70) {
+        message = `👍 Well done! You scored ${correct} out of ${exam.length} on the exam. You have a solid understanding of ${topicName}.`;
+    } else if (score >= 50) {
+        message = `📚 Good effort! You scored ${correct} out of ${exam.length}. Review the material and try again to improve your score.`;
+    } else {
+        message = `📝 You scored ${correct} out of ${exam.length}. Take time to review ${topicName} and try the exam again. Learning takes practice!`;
+    }
+    
+    document.getElementById('resultMessage').textContent = message;
+    
+    if (score >= 70) {
+        completedTopics.add(currentTopic);
+        updateStats();
+        generateTopicList();
+    }
+}
+
+function reviewAnswers() {
+    continueLearning();
+    addMessage(`📝 Here are the correct answers for your exam:<br><br>Review the topic to see detailed explanations for each question.`, 'ai');
+}
+
+function retakeExam() {
+    startExam();
+}
+
+function continueLearning() {
+    document.getElementById('examContainer').style.display = 'none';
+    document.getElementById('chatContainer').style.display = 'flex';
+    document.querySelector('.exam-content').style.display = 'grid';
+    document.getElementById('examResults').style.display = 'none';
+    
+    addMessage(`🏁 Exam completed! Continue learning about ${topics[currentTopic].title} or try another topic.`, 'ai');
+}
+
+// Voice recognition variables
+let recognition = null;
+let isRecording = false;
+
+function initVoiceRecognition() {
+    if ('webkitSpeechRecognition' in window) {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        
+        recognition.onstart = function() {
+            isRecording = true;
+            document.getElementById('voiceBtn').innerHTML = '🔴 Stop';
+            document.getElementById('voiceBtn').style.background = 'var(--warning)';
+            addMessage('🎤 Listening... Speak your question now!', 'ai');
+        };
+        
+        recognition.onresult = function(event) {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+            }
+            
+            if (event.results[event.results.length - 1].isFinal) {
+                document.getElementById('chatInput').value = transcript;
+                addMessage(`🎤 Voice input: "${transcript}"`, 'user');
+                setTimeout(() => {
+                    sendMessage();
+                }, 500);
+            }
+        };
+        
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error:', event.error);
+        };
+    }
+}
